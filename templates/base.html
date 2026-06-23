@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Cat & Dog Facts{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐱 Cat Facts & 🐶 Dog Facts</h1>
+            <p class="subtitle">Click a button to learn something new about our furry friends!</p>
+        </header>
+        
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Cat & Dog Facts | Powered by Flask</p>
+            <p class="footer-credit">Facts provided by <a href="https://catfact.ninja" target="_blank">Cat Facts API</a> & <a href="https://dog-api.kinduff.com" target="_blank">Dog API</a></p>
+        </footer>
+    </div>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
