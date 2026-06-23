@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Cat & Dog Facts - Learn Something New!{% endblock %}
+
+{% block content %}
+<div class="facts-display">
+    <div class="fact-section cat-section">
+        <div class="fact-header">
+            <span class="emoji">🐱</span>
+            <h2>Cat Fact</h2>
+        </div>
+        <div class="fact-box" id="cat-fact-box">
+            <p id="cat-fact-text" class="fact-text">Click the button to get a cat fact!</p>
+        </div>
+        <button class="btn btn-cat" onclick="getCatFact()">Get Cat Fact 🐱</button>
+    </div>
+    
+    <div class="divider">or</div>
+    
+    <div class="fact-section dog-section">
+        <div class="fact-header">
+            <span class="emoji">🐶</span>
+            <h2>Dog Fact</h2>
+        </div>
+        <div class="fact-box" id="dog-fact-box">
+            <p id="dog-fact-text" class="fact-text">Click the button to get a dog fact!</p>
+        </div>
+        <button class="btn btn-dog" onclick="getDogFact()">Get Dog Fact 🐶</button>
+    </div>
+</div>
+
+<div class="both-facts-section">
+    <button class="btn btn-both" onclick="getBothFacts()">🎉 Get Both Facts!</button>
+    <div class="loading-spinner" id="loading-spinner" style="display: none;">Loading...</div>
+</div>
+
+<div class="fact-history">
+    <h3>📜 Fact History</h3>
+    <ul id="fact-history-list">
+        <li class="empty-history">No facts viewed yet. Start exploring!</li>
+    </ul>
+    <button class="btn btn-clear" onclick="clearHistory()">Clear History</button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let factHistory = [];
+    const MAX_HISTORY = 20;
+    
+    function addToHistory(fact) {
+        if (!fact) return;
+        factHistory.unshift(fact);
+        if (factHistory.length > MAX_HISTORY) {
+            factHistory.pop();
+        }
+        updateHistoryDisplay();
+    }
+    
+    function updateHistoryDisplay() {
+        const historyList = document.getElementById('fact-history-list');
+        if (factHistory.length === 0) {
+            historyList.innerHTML = '<li class="empty-history">No facts viewed yet. Start exploring!</li>';
+            return;
+        }
+        
+        historyList.innerHTML = '';
+        factHistory.forEach(fact => {
+            const li = document.createElement('li');
+            li.textContent = fact;
+            historyList.appendChild(li);
+        });
+    }
+    
+    function clearHistory() {
+        factHistory = [];
+        updateHistoryDisplay();
+    }
+    
+    function showLoading(show) {
+        document.getElementById('loading-spinner').style.display = show ? 'block' : 'none';
+    }
+    
+    async function getCatFact() {
+        try {
+            showLoading(true);
+            const response = await fetch('/get_cat_fact');
+            const data = await response.json();
+            const factText = data.fact || 'No fact available';
+            document.getElementById('cat-fact-text').textContent = factText;
+            addToHistory(`🐱 ${factText}`);
+            // Add visual feedback
+            const box = document.getElementById('cat-fact-box');
+            box.classList.add('highlight');
+            setTimeout(() => box.classList.remove('highlight'), 500);
+        } catch (error) {
+            console.error('Error fetching cat fact:', error);
+            document.getElementById('cat-fact-text').textContent = '❌ Error fetching fact. Please try again.';
+        } finally {
+            showLoading(false);
+        }
+    }
+    
+    async function getDogFact() {
+        try {
+            showLoading(true);
+            const response = await fetch('/get_dog_fact');
+            const data = await response.json();
+            const factText = data.fact || 'No fact available';
+            document.getElementById('dog-fact-text').textContent = factText;
+            addToHistory(`🐶 ${factText}`);
+            // Add visual feedback
+            const box = document.getElementById('dog-fact-box');
+            box.classList.add('highlight');
+            setTimeout(() => box.classList.remove('highlight'), 500);
+        } catch (error) {
+            console.error('Error fetching dog fact:', error);
+            document.getElementById('dog-fact-text').textContent = '❌ Error fetching fact. Please try again.';
+        } finally {
+            showLoading(false);
+        }
+    }
+    
+    async function getBothFacts() {
+        try {
+            showLoading(true);
+            const response = await fetch('/get_both_facts');
+            const data = await response.json();
+            
+            const catFact = data.cat_fact || 'No cat fact available';
+            const dogFact = data.dog_fact || 'No dog fact available';
+            
+            document.getElementById('cat-fact-text').textContent = catFact;
+            document.getElementById('dog-fact-text').textContent = dogFact;
+            
+            addToHistory(`🐱 ${catFact}`);
+            addToHistory(`🐶 ${dogFact}`);
+            
+            // Highlight both boxes
+            const catBox = document.getElementById('cat-fact-box');
+            const dogBox = document.getElementById('dog-fact-box');
+            catBox.classList.add('highlight');
+            dogBox.classList.add('highlight');
+            setTimeout(() => {
+                catBox.classList.remove('highlight');
+                dogBox.classList.remove('highlight');
+            }, 500);
+        } catch (error) {
+            console.error('Error fetching facts:', error);
+            alert('Error fetching facts. Please try again.');
+        } finally {
+            showLoading(false);
+        }
+    }
+</script>
+{% endblock %}
